@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<html onclick="document.documentElement.requestFullscreen()" lang="pl">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <title>Moja strona</title>
+
+  <link rel="stylesheet" href="/style.css">
+
+</head>
+
+<body>
+
+  <div class="wrapper">
+
+    <header>
+
+      <nav>
+
+        <ul>
+
+          <li><a href="#">Strona główna</a></li>
+
+          <li><a href="#">O mnie</a></li>
+
+          <li><a href="#">Kontakt</a></li>
+
+          <li><a href="#">Wsparcie </a></li>
+
+          <li><a href="#">Dołacz</a></li>
+
+        </ul>
+
+      </nav>
+
+    </header>
+
+    <main>
+
+      <br>
+
+      <h1>Kashumy Github</h1>
+
+      <h2>Kliknij aby przejść na tryb pełno ekranowy </h2>
+
+      
+
+      <p id="odw" >0</p>
+
+      
+
+      <br>
+
+      <button onclick="toggleDarkMode()" id="dark-mode-toggle">
+
+  <i class="fa fa-moon"></i>☾ Tryb Ciemny</button>
+
+<pre style="white-space: pre-wrap " >
+
+Tutaj znajdziesz linki
+
+do moich projektów
+
+Copyright ©
+
+<a href="https://kashumy.github.io/itxtedit.github.io/"> Edytor Tekstu</a>
+
+<a href="https://kashumy.github.io/www.mindKashuproj.github.io/">S2 Tools</a>
+
+<a href="https://kashumy.github.io/GAME_OF_DUSTYBABELEBE/">Gra TopDown Otwarty świat
+
+Gra typu horror
+
+Gra Demo
+
+</a>
+
+Mit licence 
+
+<a href="https://kashumy.github.io/HtmlBlockIntersect/">Platformer Game</a>
+
+<a href="https://kashumy.github.io/HtmlBlockIntersect/">Platformer Game (source code)</a>
+
+</pre>
+
+      <br>
+
+      <br>
+
+      <p>Hej jestem kashumy.github
+
+      <br>Krystian Popiołek.
+
+      <br>Pracuję nad grami. Tu są moje gry.
+
+      </p>
+
+      
+
+     <br>
+
+     <a class="button" href="#">Strona</a> <pre style="white-space: pre-wrap;">
+
+     </pre>
+
+<pre style="white-space: pre-wrap;"> 
+
+Robię gry z pasją.Prubuję zrobić gry cross platform'owe.
+
+Robię też aplikacje oraz programy
+
+  <audio controls>
+
+  	<source src="./Fatal.mp3" type="audio/mpeg">
+
+  	Twoja przeglądarka nie obsługuje elementu audio.
+
+  </audio>
+
+  <br>Fatal Licence MIT
+
+  <br>
+
+  <audio controls>
+
+  	<source src="./BeepBox-Song (1).mp3" type="audio/mpeg">
+
+  	Twoja przeglądarka nie obsługuje elementu audio.
+
+  </audio>
+
+  <br>BitAway Licence MIT
+
+  <br>
+
+  <br>MIT License you can copy but you must 
+
+  <br>Give name of the real author
+
+  <br>
+
+  <br>
+
+    <audio controls>
+
+  	<source src="./BeepBox-Song (3).mp3" type="audio/mpeg">
+
+  	Twoja przeglądarka nie obsługuje elementu audio.
+
+  </audio>
+
+  <br>Long Licence MIT
+
+  <br>
+
+  <br>
+
+  <br> Download Songz
+
+  <a href="./BeepBox-Song (3).json">Some Music BeepBox-Song (3).json</a>
+
+  <a href="./BeepBox-Song (13).json">Some Music BeepBox-Song (13).json</a>
+
+</pre>
+
+    </main>
+
+    <footer>
+
+      
+
+      <p>&copy; 2023 Byteshell Wszelkie prawa zastrzeżone. Nie kopiować bez podania Autora gdy publikujesz MIT</p>
+
+    </footer>
+
+  </div>
+
+</body>
+
+</html>
+
+<link rel="stylesheet" href="style.css">
+
+<script src="./main.js"></script>
+
+<script>
+
+  // Funkcja zwiększająca licznik o 1
+
+  function increaseCounter() {
+
+    var counterElement = document.getElementById('odw');
+
+    var currentCount = parseInt(counterElement.innerText);
+
+    counterElement.innerText = currentCount + 1;
+
+  }
+
+  // Wywołanie funkcji increaseCounter() przy załadowaniu strony
+
+  window.onload = increaseCounter;
+
+</script>
