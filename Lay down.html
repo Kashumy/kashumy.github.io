@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html onclick="document.documentElement.requestFullscreen()" lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Particle Animation</title>
+  <style>
+    body {
+      margin: 0;
+      position: fixed;
+      background: black;
+         -webkit-filter: url(#ca) url(#bm);
+      overflow: hidden;
+      animation :0.5s azd infinite steps(2) ;
+      
+    }
+html{
+  filter: grayscale(0.7)
+}
+    .particle-container {
+      
+    }
+@keyframes azd{
+  0%{
+    left:1px;
+  }
+  20%{
+    top:1px;
+  }
+  50%{
+    top:-1px;    
+  }
+  100%{
+    left :-1px;
+  }
+}
+
+.particle {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: #028100;
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <!-- shaders for body -->
+  <svg width="0" height="0">
+    <!-- Dodaj filtr 'bm' (bloom) dla całego ciała strony -->
+    <filter id="bm">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+
+    <!-- Filtr 'ca' (chromatic-aberration) dla kontenera z animowanymi kulkami -->
+    <filter id="ca">
+      <feColorMatrix type="matrix" 
+        result="red_"             
+        values="4 0 0 0 0
+                0 0 0 0 0 
+                0 0 0 0 0 
+                0 0 0 1 0"/>
+      <feOffset in="red_" dx="0.8" dy="0" result="red"/>
+      <feColorMatrix type="matrix" 
+        in="SourceGraphic"             
+        result="blue_"             
+        values="0 0 0 0 0
+                0 3 0 0 0 
+                0 0 10 0 0 
+                0 0 0 1 0"/>
+      <feOffset in="blue_" dx="-0.8" dy="0" result="blue"/>    
+      <feBlend mode="screen" in="red" in2="blue"/>
+    </filter>
+  </svg>
+
+  <div class="particle-container">
+    <script>
+      function createParticle() {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.top = Math.random() * window.innerHeight + 'px';
+        particle.style.left = Math.random() * window.innerWidth + 'px';
+        document.body.appendChild(particle);
+
+        let size = 2;
+        let opacity = 0.5;
+        let hue = 180; // Wartość hue dla koloru zielonego (zielony = 120°)
+
+        const animationInterval = setInterval(() => {
+          size += 0.05;
+          opacity -= 0.01;
+          particle.style.transform = `scale(${size})`; // Skalowanie
+          particle.style.opacity = opacity;
+
+          // Zmieniamy hue koloru na żółty stopniowo (żółty = 60°)
+          hue = Math.max(hue - 2, 60);
+          particle.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
+
+          if (opacity <= 0) {
+            clearInterval(animationInterval);
+            particle.style.display = 'none';
+            particle.remove();
+          }
+        }, 30); // Ustawiamy czas interwału animacji (tutaj 30ms)
+      }
+
+      function animateParticles() {
+        setInterval(createParticle, 200); // Ustawiamy interwał tworzenia nowych kropek (tutaj 200ms)
+      }
+
+      animateParticles();
+    </script>
+  </div>
+</body>
+</html>
