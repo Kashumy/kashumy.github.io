@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monokai Style Menu</title>
+<div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 99999; background: radial-gradient(circle at center, transparent, transparent 80%, rgba(0, 0, 0, 0.5) 100%, rgba(0, 0, 0, 0.8) 150%); pointer-events: none;"></div>
+<style>
+html{
+  position: fixed;
+  width:100vw;
+  height:100vh;
+  overflow: hidden; /* Ukryj przewijanie */
+  animation: 5s ds infinite cubic-bezier(0.86, 0, 0.07, 1);
+}
+
+body {
+  position: fixed;
+  width:100vw;
+  height:100vh;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #272822;
+  color: #f8f8f2;
+  backdrop-filter: blur(10px); /* Rozmyj krawędzie */
+}
+
+header {
+  background-color: #49483e;
+  padding: 20px;
+  text-align: center;
+}
+
+.logo {
+  max-width: 300px;
+}
+
+main {
+  text-align: center;
+  margin-top: 20px;
+}
+
+@keyframes ds{
+  0%{
+    filter: sepia(20%);
+  }
+  50%{
+    filter: sepia(60%);
+  }
+  100%{
+    filter: sepia(20%);
+  }
+}
+
+button {
+  padding: 10px 20px;
+  margin: 0 10px;
+  font-size: 16px;
+  background-color: #75715E;
+  border: none;
+  color: #f8f8f2;
+  transition: background-color 0.3s;
+}
+.btn {
+  padding: 10px 20px;
+  margin: 0 0px;
+  font-size: 16px;
+  background-color: #75715E;
+  border: none;
+  
+  color: #f8f8f2;
+  transition: background-color 0.3s;
+}
+
+button:hover {
+  background-color: #a59f85;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0px;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+  background-color: #272822;
+  margin: 20px ;
+  padding: 20px;
+  border: 1px solid #75715e;
+  width: 80%;
+}
+a{
+  width:100%; height:50px;
+  text-decoration: none;
+  white-space: pre-wrap;
+  margin-top: 50px; color:white;
+}
+
+.close {
+  color: #f8f8f2;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  transition: color 0.3s;
+}
+
+.close:hover,
+.close:focus {
+  color: #75715e;
+  text-decoration: none;
+}
+
+.text-animation {
+  animation: glow 3s infinite;
+}
+
+@keyframes glow {
+  0% {
+    text-shadow: 0 0 5px rgba(255, 255, 147, 0.7);
+  }
+  50% {
+    text-shadow: 0 0 10px rgba(215, 255, 147, 0.9);
+  }
+  100% {
+    text-shadow: 0 0 5px rgba(255, 255, 147, 0.7);
+  }
+}
+        #scrolling-text {
+            position: relative;
+            animation: scroll 84s linear infinite;
+            white-space: nowrap;
+            font-size: 24px;
+            width: 100%;
+            color: white;
+            padding: 20px;
+        }
+        @keyframes scroll {
+            0% {
+                left: 100%;
+            }
+            100% {
+                left: -10000px;
+            }
+        }
+        #boxtext {
+            background-color: #52594B;
+            width: 100%;
+            padding: 10px;
+            overflow: hidden;
+            height: 20px;
+        }
+</style>
+</head>
+<body>
+
+<header>
+Kashumy
+</header>
+            <div id="boxtext">
+              <p id="scrolling-text" style=" margin-top: -16px; font-size: 15px">
+Welcome there is my repositories i maded Paper maker UbenGame with my Oc in papermaker game similar to a robot want ice cream and much much more than you think 
+              </p>
+            </div>
+<main>
+<pre style="white-space: pre-wrap">
+<a href="./index.html" style="color: rgba(0,0,0,0.0"> <button id="runButton">back to menu</button></a> <button id="aboutButton">about</button>
+
+<div class="btn" ><a href="https://kashumy.github.io/WebGameEditor/">Paper Maker</a></div>
+<div class="btn" ><a href="https://kashumy.github.io/ubenplatinum/">Uben Platinum</a></div>
+<div class="btn" ><a href="https://kashumy.github.io/WorkBench/">Work Bench</a></div>
+
+ <br> <br>
+</pre>
+<!--<a href="/runthis.html" style="color: rgba(0,0,0,0.0"> <button>Play Game /ubenplatinum</button></a>-->
+</main>
+
+<div id="aboutModal"  class="modal">
+  <div class="modal-content" style="height:60%; overflow: hidden scroll; position: fixed; top:0; left:0;">
+    <span class="close">&times;</span>
+<pre style="white-space: pre-wrap">
+    
+There is my best repos 
+
+</pre>
+  </div>
+  
+</div>
+
+<script>
+  const runButton = document.getElementById('runButton');
+  const aboutButton = document.getElementById('aboutButton');
+  const aboutModal = document.getElementById('aboutModal');
+  const closeButton = document.getElementsByClassName('close')[0];
+
+  runButton.addEventListener('click', () => {
+    // Dodaj funkcję, która uruchamia twój paper maker
+    
+  });
+
+  aboutButton.addEventListener('click', () => {
+    aboutModal.style.display = 'block';
+  });
+
+  closeButton.addEventListener('click', () => {
+    aboutModal.style.display = 'none';
+  });
+
+  window.addEventListener('click', (e) => {
+    if (e.target == aboutModal) {
+      aboutModal.style.display = 'none';
+    }
+  });
+</script>
+
+</body>
+</html>
