@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en" ondblclick="document.querySelector('html').requestFullscreen()">
+<head>
+<meta charset="UTF-8" />
+<meta meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="icon" href="./Untitled161_20240404213620.png" type="image/png">
+    <meta name="description" content="Hi I'm Kashumy">
+    <meta name="keywords" content="kashumy, nexaturion">
+    <meta name="author" content="Krystian.P (Kashumy)">
+    <meta name="robots" content="index, follow">
+    <meta name="og:description" content="Hi im Kashumy and im Just programming ">
+    <meta name="og:image" content="./Untitled161_20240404213620.png">
+    <meta name="og:url" content="https://kashumy.github.io">
+
+<title>About Kashumy</title>
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+    font-family: sans-serif;
+  }
+
+  html {
+  	
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  canvas {
+    display: block;
+  }
+
+  #boxtext {
+    position: absolute;
+    top: 0;
+    background-color: #52594B38;
+    width: 100%;
+    padding: 5px;
+    overflow: hidden;
+    height: 20px;
+  }
+
+  #scrolling-text {
+    position: relative;
+    animation: scroll 84s linear infinite;
+    white-space: nowrap;
+    font-size: 15px;
+    width: 100%;
+    color: white;
+    padding: 15px 0;
+    margin-top: -16px;
+  }
+
+  @keyframes scroll {
+    0% {
+      left: 100%;
+    }
+    100% {
+      left: -10000px;
+    }
+  }
+
+  #centered-links {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #52594B38;
+    padding: 20px;
+    width: 300px;
+    height: 200px;
+    overflow: hidden;
+    color: white;
+     
+  }
+
+  #links {
+    overflow: hidden;
+    height: 200px; 
+  }
+
+  #links-inner {
+    overflow-y: hidden;
+    height: 100%;
+  }
+
+  #links-inner a {
+    color: white;
+    display: block;
+    height: 40px;
+    line-height: 40px;
+    text-decoration: none;
+    transition: opacity 0.2s;
+    cursor: none;
+  }
+
+  #links-inner a:hover {
+    opacity: 0.7;
+  }
+
+  .scroll-btn {
+    background: #52594B38;
+    color: white;
+    border: none;
+    width: 25px;
+    padding: 5px;
+     
+  }
+</style>
+
+<body>
+  <canvas id="glcanvas"></canvas>
+
+  <div id="boxtext">
+    <p id="scrolling-text">
+Hi! I’m Krystian, also known on GitHub as Kashumy. I work on a wide range of creative and technical projects, mostly using JavaScript. I build mobile apps with Java and WebView And Various WebSites , and I enjoy designing visuals, composing music,  Also im creating various of mobile software 
+
+    </p>
+  </div>
+
+  <div id="centered-links">
+
+    <div id="links">
+      <div id="links-inner">
+        <a href="https://github.com/Kashumy/Fruity-Box">FruityBox</a>
+        <a href="https://github.com/Kashumy/Primoria-Ferox-Latest">Primoria Ferox</a>
+        <a href="https://github.com/Kashumy/AudioLab">AudioLab</a>
+        <a href="https://github.com/Kashumy/jtx-transcripter">Atexp Editor IDE</a>
+        <a href="https://kashumy.github.io/ByteBeat/">My ByteBeat</a>
+        <a href="https://github.com/Kashumy/OSUFinalBoss">Weird Osu remake</a>
+        <a href="https://kashumy.github.io/JS-Pianino/">Play Virtual Piano</a>
+        <a href="https://github.com/Kashumy?tab=repositories">Visit Github</a>
+      </div>
+    </div>
+    <div style="position: absolute; bottom:5px; right:7px;">
+    <button class="scroll-btn" onclick="scrollLinks(-1)">▲</button>
+    <button class="scroll-btn" onclick="scrollLinks(1)">▼</button>
+    </div>
+  </div>
+
+  <script>
+    let currentIndex = 0;
+    const linkHeight = 40;
+    const linksInner = document.getElementById('links-inner');
+    const totalLinks = linksInner.children.length;
+
+    function scrollLinks(direction) {
+      currentIndex += direction;
+      if (currentIndex < 0) currentIndex = 0;
+      if (currentIndex >= totalLinks-5) currentIndex = totalLinks-5 ;
+
+      linksInner.scrollTo({
+        top: currentIndex * linkHeight,
+        behavior: 'smooth'
+      });
+    }
+  </script>
+</body>
+
+
+
+<script id="vertex-shader" type="x-shader/x-vertex">
+precision highp float;
+attribute vec4 a_position;
+void main() {
+  gl_Position = a_position;
+}
+</script>
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision highp float;
+uniform float iTime;
+uniform vec3 iResolution;
+uniform vec3 camPos;
+uniform vec3 camDir;
+uniform sampler2D floorTexture;
+#define MAX_SPHERES 64
+#define MAX_CUBES 64
+#define MAX_TRIANGLES 64
+#define MAX_BOUNCES 20
+#define EPSILON 0.02
+#define INF 1e3
+struct Sphere {
+  vec3 pos;
+  float radius;
+  vec3 color;
+  float isLambert;
+  float isReflective;
+  float cameraInvisible;
+  float noshadow;
+};
+struct Cube {
+  vec3 pos;
+  vec3 size;
+  vec3 color;
+  float isLambert;
+  float isReflective;
+  float cameraInvisible;
+  float noshadow;
+  vec3 rotation;
+};
+struct Triangle {
+  vec3 v0;
+  vec3 v1;
+  vec3 v2;
+  vec3 color;
+  float isLambert;
+  float isReflective;
+  float noshadow;
+};
+struct Ray {
+  vec3 origin;
+  vec3 dir;
+};
+struct Hit {
+  float t;
+  vec3 point;
+  vec3 normal;
+  int material;
+  vec3 color;
+  float isLambert;
+  float isReflective;
+  float noshadow;
+};
+uniform Sphere spheres[MAX_SPHERES];
+uniform Cube cubes[MAX_CUBES];
+uniform Triangle triangles[MAX_TRIANGLES];
+float triangleIntersect(vec3 ro, vec3 rd, Triangle tri, out vec3 n) {
+  vec3 edge1 = tri.v1 - tri.v0;
+  vec3 edge2 = tri.v2 - tri.v0;
+  vec3 pvec = cross(rd, edge2);
+  float det = dot(edge1, pvec);
+  if (abs(det) < EPSILON) return INF;
+  float invDet = 1.0 / det;
+  vec3 tvec = ro - tri.v0;
+  float u = dot(tvec, pvec) * invDet;
+  if(u < 0.0 || u > 1.0) return INF;
+  vec3 qvec = cross(tvec, edge1);
+  float v = dot(rd, qvec) * invDet;
+  if(v < 0.0 || u + v > 1.0) return INF;
+  float t = dot(edge2, qvec) * invDet;
+  if(t < EPSILON) return INF;
+  n = normalize(cross(edge1, edge2));
+  if(dot(n, rd) > 0.0) n = -n;
+  return t;
+}
+mat3 rotationMatrix(vec3 rot) {
+  float sx = sin(rot.x), cx = cos(rot.x);
+  float sy = sin(rot.y), cy = cos(rot.y);
+  float sz = sin(rot.z), cz = cos(rot.z);
+  mat3 rx = mat3(1,0,0, 0,cx,-sx, 0,sx,cx);
+  mat3 ry = mat3(cy,0,sy, 0,1,0, -sy,0,cy);
+  mat3 rz = mat3(cz,-sz,0, sz,cz,0, 0,0,1);
+  return rz * ry * rx;
+}
+float sphereIntersect(vec3 ro, vec3 rd, Sphere s, out vec3 n) {
+  vec3 oc = ro - s.pos;
+  float b = dot(oc, rd);
+  float c_ = dot(oc, oc) - s.radius * s.radius;
+  float h = b * b - c_;
+  if(h < 0.0) return INF;
+  h = sqrt(h);
+  float t = -b - h;
+  if(t < EPSILON) t = -b + h;
+  if(t < EPSILON) return INF;
+  vec3 p = ro + rd * t;
+  n = normalize(p - s.pos);
+  return t;
+}
+float cubeIntersect(vec3 ro, vec3 rd, Cube c, out vec3 n) {
+	vec3 minB = c.pos - c.size * 0.5;
+	vec3 maxB = c.pos + c.size * 0.5;
+	vec3 invDir = 1.0 / rd;
+	vec3 tmin = (minB - ro) * invDir;
+	vec3 tmax = (maxB - ro) * invDir;
+	vec3 t1 = min(tmin, tmax);
+	vec3 t2 = max(tmin, tmax);
+	float tNear = max(max(t1.x, t1.y), t1.z);
+	float tFar = min(min(t2.x, t2.y), t2.z);
+	if (tNear > tFar || tFar < 0.0) return INF;
+	float t = tNear > 0.0 ? tNear : tFar;
+	vec3 hitPos = ro + rd * t;
+	const float bias = 0.01;
+	if (abs(hitPos.x - minB.x) < bias) n = vec3(-1, 0, 0);
+	else if (abs(hitPos.x - maxB.x) < bias) n = vec3(1, 0, 0);
+	else if (abs(hitPos.y - minB.y) < bias) n = vec3(0, -1, 0);
+	else if (abs(hitPos.y - maxB.y) < bias) n = vec3(0, 1, 0);
+	else if (abs(hitPos.z - minB.z) < bias) n = vec3(0, 0, -1);
+	else if (abs(hitPos.z - maxB.z) < bias) n = vec3(0, 0, 1);
+	else n = vec3(0);
+	return t;
+}
+float planeIntersect(vec3 ro, vec3 rd, vec3 n, float d, out vec3 hn) {
+  float denom = dot(rd, n);
+  if(abs(denom) < EPSILON) return INF;
+  float t = -(dot(ro, n) + d) / denom;
+  if(t < EPSILON) return INF;
+  hn = n;
+  return t;
+}
+vec3 reflectRay(vec3 I, vec3 N) {
+  return I - 2.0 * dot(N, I) * N;
+}
+vec3 getFloorTex(vec3 pos) {
+  vec2 uv = fract(pos.xz * 0.1);
+return texture2D(floorTexture, uv).rgb;
+}
+Hit trace(Ray ray) {
+  Hit hit;
+  hit.t = INF;
+  vec3 n;
+  for(int i = 0; i < MAX_SPHERES; i++) {
+    if(spheres[i].radius == 0.0) break;
+    if(spheres[i].cameraInvisible > 0.5 && ray.origin == camPos) continue;
+    float t = sphereIntersect(ray.origin, ray.dir, spheres[i], n);
+    if(t < hit.t){
+      hit.t = t;
+      hit.point = ray.origin + ray.dir * t;
+      hit.normal = n;
+      hit.material = 1;
+      hit.color = spheres[i].color;
+      hit.isLambert = spheres[i].isLambert;
+      hit.isReflective = spheres[i].isReflective;
+      hit.noshadow = spheres[i].noshadow;
+    }
+  }
+  for(int i = 0; i < MAX_TRIANGLES; i++) {
+    if(triangles[i].v0 == vec3(0.0)) break;
+    float t = triangleIntersect(ray.origin, ray.dir, triangles[i], n);
+    if(t < hit.t){
+      hit.t = t;
+      hit.point = ray.origin + ray.dir * t;
+      hit.normal = n;
+      hit.material = 4;
+      hit.color = triangles[i].color;
+      hit.isLambert = triangles[i].isLambert;
+      hit.isReflective = triangles[i].isReflective;
+      hit.noshadow = triangles[i].noshadow;
+    }
+  }
+  for(int i = 0; i < MAX_CUBES; i++) {
+    if(cubes[i].size == vec3(0.0)) break;
+    if(cubes[i].cameraInvisible > 0.5 && ray.origin == camPos) continue;
+    float t = cubeIntersect(ray.origin, ray.dir, cubes[i], n);
+    if(t < hit.t){
+      hit.t = t;
+      hit.point = ray.origin + ray.dir * t;
+      hit.normal = n;
+      hit.material = 3;
+      hit.color = cubes[i].color;
+      hit.isLambert = cubes[i].isLambert;
+      hit.isReflective = cubes[i].isReflective;
+      hit.noshadow = cubes[i].noshadow;
+    }
+  }
+  vec3 fn;
+  float tf = planeIntersect(ray.origin, ray.dir, vec3(0.,1.,0.), 0., fn);
+  if(tf < hit.t){
+    hit.t = tf;
+    hit.point = ray.origin + ray.dir * tf;
+    hit.normal = fn;
+    hit.material = 2;
+    hit.color = getFloorTex(hit.point);
+    hit.isReflective = 1.0;
+    hit.noshadow = 0.0;
+    hit.isLambert = 1.0;
+  }
+  return hit;
+}
+vec3 shade(Ray ray){
+  vec3 color = vec3(0.0);
+  vec3 atten = vec3(1.0);
+  for(int bounce = 0; bounce < MAX_BOUNCES; bounce++){
+    Hit hit = trace(ray);
+    if(hit.t == INF){
+      color += atten * vec3(0.5, 0.7, 1.0);
+      break;
+    }
+    vec3 lightDir = normalize(vec3(-3.0, 5.0, -4.0));
+    Ray shadowRay;
+    shadowRay.origin = hit.point + hit.normal * EPSILON;
+    shadowRay.dir = lightDir;
+    float shadow = 1.0;
+    Hit shadowHit = trace(shadowRay);
+    if(shadowHit.t < INF && shadowHit.noshadow < 0.5) {
+      shadow = mix(0.2, 1.0, 0.0);
+    }
+    float lambert = max(dot(hit.normal, lightDir), 0.0);
+    vec3 localColor = hit.color * lambert * shadow;
+    if(hit.material == 4 && hit.noshadow == 1.0) {
+      color += hit.color;
+      break;
+    } else {
+      color += atten * localColor;
+    }
+    if(hit.isReflective > 0.5){
+      ray.origin = hit.point + hit.normal * EPSILON;
+      ray.dir = reflectRay(ray.dir, hit.normal);
+      atten *= 0.5;
+    } else {
+      break;
+    }
+  }
+  return color;
+}
+void main(){
+  vec2 uv = (gl_FragCoord.xy - 0.5 * iResolution.xy) / iResolution.y;
+  vec3 forward = normalize(camDir);
+  vec3 right = normalize(cross(forward, vec3(0.0, 1.0, 0.0)));
+  vec3 up = cross(right, forward);
+  vec3 rayDir = normalize(forward + uv.x * right + uv.y * up);
+  Ray ray;
+  ray.origin = camPos;
+  ray.dir = rayDir;
+  vec3 col = shade(ray);
+  gl_FragColor = vec4(pow(col, vec3(1.0 / 2.2)), 1.0);
+}
+</script>
+<script type="module">
+function getShaderSource(id){
+  return document.querySelector(`#${id}`).textContent;
+}
+const MAX_SPHERES = 64;
+const MAX_CUBES = 64;
+let spheres = [
+  {
+    pos: { x: 0.0, y: 2.0, z: -5.0 },
+    radius: 1.0,
+    color: [1.0, 0.0, 0.0],
+    isLambert: 1,
+    isReflective: 1,
+    cameraInvisible: 1
+  },
+];
+let cubes = [
+];
+const MAX_TRIANGLES = 64;
+var triangles = [
+];
+function flattenTriangles(triangles) {
+  const arr = new Float32Array(MAX_TRIANGLES * 15);
+  triangles.forEach((tri, i) => {
+    const base = i * 15;
+    arr[base + 0] = tri.v0.x;
+    arr[base + 1] = tri.v0.y;
+    arr[base + 2] = tri.v0.z;
+    arr[base + 3] = tri.v1.x;
+    arr[base + 4] = tri.v1.y;
+    arr[base + 5] = tri.v1.z;
+    arr[base + 6] = tri.v2.x;
+    arr[base + 7] = tri.v2.y;
+    arr[base + 8] = tri.v2.z;
+    arr[base + 9] = tri.color[0];
+    arr[base + 10] = tri.color[1];
+    arr[base + 11] = tri.color[2];
+    arr[base + 12] = tri.isLambert;
+    arr[base + 13] = tri.isReflective;
+    arr[base + 14] = tri.cameraInvisible;
+    arr[base + 15] = tri.noshadow||0; 
+    arr[base + 16] = tri.rotation[0]||0;
+    arr[base + 17] = tri.rotation[1]||0; 
+    arr[base + 18] = tri.rotation[2]||0; 
+  });
+  return arr;
+}
+function flattenSpheres(spheres) {
+  const arr = new Float32Array(MAX_SPHERES * 11); 
+  spheres.forEach((s, i) => {
+    const base = i * 11;
+    arr[base + 0] = s.pos.x;
+    arr[base + 1] = s.pos.y;
+    arr[base + 2] = s.pos.z;
+    arr[base + 3] = s.radius;
+    arr[base + 4] = s.color[0];
+    arr[base + 5] = s.color[1];
+    arr[base + 6] = s.color[2];
+    arr[base + 7] = s.isLambert;
+    arr[base + 8] = s.isReflective;
+    arr[base + 9] = s.cameraInvisible;
+    arr[base + 10] = s.noshadow||0;  
+  });
+  return arr;
+}
+function flattenCubes(cubes) {
+  const arr = new Float32Array(MAX_CUBES * 12); 
+  cubes.forEach((c, i) => {
+    const base = i * 12;
+    arr[base + 0] = c.pos.x;
+    arr[base + 1] = c.pos.y;
+    arr[base + 2] = c.pos.z;
+    arr[base + 3] = c.size.x;
+    arr[base + 4] = c.size.y;
+    arr[base + 5] = c.size.z;
+    arr[base + 6] = c.color[0];
+    arr[base + 7] = c.color[1];
+    arr[base + 8] = c.color[2];
+    arr[base + 9] = c.isLambert;
+    arr[base + 10] = c.isReflective;
+    arr[base + 11] = c.cameraInvisible;
+    arr[base + 12] = c.noshadow||0; 
+    arr[base + 13] = c.rotation[0] || 0;
+    arr[base + 14] = c.rotation[1] || 0;
+    arr[base + 15] = c.rotation[2] || 0;
+  });
+  return arr;
+}
+function setUniformArray(gl, program, name, data, structSize) {
+  for (let i = 0; i < data.length / structSize; i++) {
+    const uniformBase = `${name}[${i}]`;
+    for (let j = 0; j < structSize; j++) {
+      const loc = gl.getUniformLocation(program, `${uniformBase}.${getStructField(name, j)}`);
+      if (loc !== null) {
+        gl.uniform1f(loc, data[i * structSize + j]);
+      }
+    }
+  }
+}
+function getStructField(type, index) {
+  if (type === 'spheres') {
+    return ['pos.x', 'pos.y', 'pos.z', 'radius', 'color.x', 'color.y', 'color.z', 'isLambert', 'isReflective', 'cameraInvisible'][index];
+  } else if (type === 'cubes') {
+    return ['pos.x', 'pos.y', 'pos.z', 'size.x', 'size.y', 'size.z', 'color.x', 'color.y', 'color.z', 'isLambert', 'isReflective', 'cameraInvisible'][index];
+  }
+  return '';
+}
+const canvas = document.getElementById('glcanvas');
+const gl = canvas.getContext("webgl", { antialias: false });
+const scaleFactor = 2;
+canvas.width = window.innerWidth * scaleFactor;
+canvas.height = window.innerHeight * scaleFactor;
+canvas.style.width = "100vw"
+canvas.style.height = "100vh"
+if(!gl) throw new Error('WebGL1 not supported');
+function resize(){
+  canvas.width = window.innerWidth * scaleFactor;
+canvas.height = window.innerHeight * scaleFactor;
+canvas.style.width = "100vw"
+canvas.style.height = "100vh"
+  gl.viewport(0,0,canvas.width,canvas.height);
+}
+window.addEventListener('resize',resize);
+resize();
+function compileShader(src, type){
+  const shader = gl.createShader(type);
+  gl.shaderSource(shader, src);
+  gl.compileShader(shader);
+  if(!gl.getShaderParameter(shader, gl.COMPILE_STATUS)){
+    console.error(gl.getShaderInfoLog(shader));
+    throw new Error('Shader compile failed');
+  }
+  return shader;
+}
+function createProgram(vsSource, fsSource){
+  const vs = compileShader(vsSource, gl.VERTEX_SHADER);
+  const fs = compileShader(fsSource, gl.FRAGMENT_SHADER);
+  const prog = gl.createProgram();
+  gl.attachShader(prog, vs);
+  gl.attachShader(prog, fs);
+  gl.linkProgram(prog);
+  if(!gl.getProgramParameter(prog, gl.LINK_STATUS)){
+    console.error(gl.getProgramInfoLog(prog));
+    throw new Error('Program link failed');
+  }
+  return prog;
+}
+const vertexShaderSource = getShaderSource('vertex-shader');
+const fragmentShaderSource = getShaderSource('fragment-shader');
+const program = createProgram(vertexShaderSource, fragmentShaderSource);
+gl.useProgram(program);
+const quadVerts = new Float32Array([
+  -1, -1, 1, -1, -1, 1,
+  -1, 1, 1, -1, 1, 1
+]);
+const posLoc = gl.getAttribLocation(program, 'a_position');
+const posBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, posBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, quadVerts, gl.STATIC_DRAW);
+gl.enableVertexAttribArray(posLoc);
+gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
+let loc_iResolution,loc_iTime,loc_fov,loc_dpi,loc_camPos,loc_camDir,loc_floorTexture;
+ loc_iTime = gl.getUniformLocation(program, 'iTime');
+ loc_iResolution = gl.getUniformLocation(program, 'iResolution');
+ loc_fov = gl.getUniformLocation(program, 'fov');
+ loc_dpi = gl.getUniformLocation(program, 'dpi');
+ loc_camPos = gl.getUniformLocation(program, 'camPos');
+ loc_camDir = gl.getUniformLocation(program, 'camDir');
+ loc_floorTexture = gl.getUniformLocation(program, 'floorTexture');
+ function rotationMatrix(rot) {
+  const sx = Math.sin(rot.x), cx = Math.cos(rot.x);
+  const sy = Math.sin(rot.y), cy = Math.cos(rot.y);
+  const sz = Math.sin(rot.z), cz = Math.cos(rot.z);
+  const rx = [
+    [1, 0, 0],
+    [0, cx, -sx],
+    [0, sx, cx]
+  ];
+  const ry = [
+    [cy, 0, sy],
+    [0, 1, 0],
+    [-sy, 0, cy]
+  ];
+  const rz = [
+    [cz, -sz, 0],
+    [sz, cz, 0],
+    [0, 0, 1]
+  ];
+  return multiplyMatrices(multiplyMatrices(rz, ry), rx);
+}
+function multiplyMatrices(a, b) {
+  const res = [];
+  for(let i=0; i<3; i++){
+    res[i] = [];
+    for(let j=0; j<3; j++){
+      res[i][j] = 0;
+      for(let k=0; k<3; k++){
+        res[i][j] += a[i][k] * b[k][j];
+      }
+    }
+  }
+  return res;
+}
+function vecMatMul(m, v) {
+  return {
+    x: m[0][0]*v.x + m[0][1]*v.y + m[0][2]*v.z,
+    y: m[1][0]*v.x + m[1][1]*v.y + m[1][2]*v.z,
+    z: m[2][0]*v.x + m[2][1]*v.y + m[2][2]*v.z
+  };
+}
+function rotateTriangles(triangles, rotation) {
+  const rotRad = {
+    x: rotation.x * 2 * Math.PI,
+    y: rotation.y * 2 * Math.PI,
+    z: rotation.z * 2 * Math.PI,
+  };
+  let pivot = {x:0, y:0, z:0};
+  let count = 0;
+  for (const tri of triangles) {
+    pivot.x += tri.v0.x + tri.v1.x + tri.v2.x;
+    pivot.y += tri.v0.y + tri.v1.y + tri.v2.y;
+    pivot.z += tri.v0.z + tri.v1.z + tri.v2.z;
+    count += 3;
+  }
+  pivot.x /= count;
+  pivot.y /= count;
+  pivot.z /= count;
+  const R = rotationMatrix(rotRad);
+  // obróć każdy wierzchołek
+  return triangles.map(tri => {
+    function rotateVertex(v) {
+      const local = {x: v.x - pivot.x, y: v.y - pivot.y, z: v.z - pivot.z};
+      const rotated = vecMatMul(R, local);
+      return {
+        x: rotated.x + pivot.x,
+        y: rotated.y + pivot.y,
+        z: rotated.z + pivot.z
+      };
+    }
+    return {
+      ...tri,
+      v0: rotateVertex(tri.v0),
+      v1: rotateVertex(tri.v1),
+      v2: rotateVertex(tri.v2),
+    };
+  });
+}
+const fovValue = 200.0;
+let camPos = vec3(0,1.5,0-10);
+let yaw = 0, pitch = 0;
+let camDir = vec3(0,0,-1);
+let lastTouch = null;
+const keys = {};
+const moveSpeed = 0.04;
+function start(){
+  function applyLockMove(vec, lockMove) {
+  lockMove = (lockMove || "").toUpperCase();
+  return {
+    x: lockMove.includes('X') ? 0 : vec.x,
+    y: lockMove.includes('Y') ? 0 : vec.y,
+    z: lockMove.includes('Z') ? 0 : vec.z,
+  };
+}
+function animate(t) {
+  t *= 0.001;
+  gl.viewport(0, 0, canvas.width, canvas.height);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.useProgram(program);
+let CUBE_COUNT=1;
+  const loc_cubescount = gl.getUniformLocation(program, 'CUBE_COUNT');
+  gl.uniform1f(loc_cubescount, CUBE_COUNT);
+  const flattenedSpheres = flattenSpheres(spheres);
+const flattenedCubes = flattenCubes(cubes);
+gl.useProgram(program);
+function setSpheres(gl, program, spheres) {
+  for (let i = 0; i < spheres.length; i++) {
+    const s = spheres[i];
+    const base = `spheres[${i}]`;
+    gl.uniform3f(gl.getUniformLocation(program, base + '.pos'), s.pos.x, s.pos.y, s.pos.z);
+    gl.uniform1f(gl.getUniformLocation(program, base + '.radius'), s.radius);
+    gl.uniform3f(gl.getUniformLocation(program, base + '.color'), s.color[0], s.color[1], s.color[2]);
+    gl.uniform1f(gl.getUniformLocation(program, base + '.isLambert'), s.isLambert);
+    gl.uniform1f(gl.getUniformLocation(program, base + '.isReflective'), s.isReflective);
+    gl.uniform1f(gl.getUniformLocation(program, base + '.cameraInvisible'), s.cameraInvisible);
+    gl.uniform1f(gl.getUniformLocation(program, base + '.noshadow'), s.noshadow||0);
+  }
+}
+gl.uniform1i(gl.getUniformLocation(program, 'SPHERE_COUNT'), spheres.length);
+function setTriangles(gl, program, triangles) {
+  for (let i = 0; i < triangles.length; i++) {
+    const tri = triangles[i];
+    const base = `triangles[${i}]`;
+    gl.uniform3f(gl.getUniformLocation(program, base + '.v0'), tri.v0.x, tri.v0.y, tri.v0.z);
+    gl.uniform3f(gl.getUniformLocation(program, base + '.v1'), tri.v1.x, tri.v1.y, tri.v1.z);
+    gl.uniform3f(gl.getUniformLocation(program, base + '.v2'), tri.v2.x, tri.v2.y, tri.v2.z);
+    gl.uniform3f(gl.getUniformLocation(program, base + '.color'), tri.color[0], tri.color[1], tri.color[2]);
+    gl.uniform1f(gl.getUniformLocation(program, base + '.isLambert'), tri.isLambert);
+    gl.uniform1f(gl.getUniformLocation(program, base + '.isReflective'), tri.isReflective);
+    gl.uniform1f(gl.getUniformLocation(program, base + '.cameraInvisible'), tri.cameraInvisible);
+    gl.uniform1f(gl.getUniformLocation(program, base + '.noshadow'), tri.noshadow||0);
+    gl.uniform3f(gl.getUniformLocation(program, base + '.rotation'), tri.rotation.x, tri.rotation.y, tri.rotation.z);
+  }
+  gl.uniform1i(gl.getUniformLocation(program, 'TRIANGLE_COUNT'), triangles.length);
+}
+setTriangles(gl, program, triangles);
+gl.uniform1i(gl.getUniformLocation(program, 'CUBE_COUNT'), cubes.length);
+setSpheres(gl, program, spheres)
+function setCubes(gl, program, cubes) {
+  for (let i = 0; i < cubes.length; i++) {
+    const c = cubes[i];
+    const base = `cubes[${i}]`;
+    gl.uniform3f(gl.getUniformLocation(program, base + '.pos'), c.pos.x, c.pos.y, c.pos.z);
+    gl.uniform3f(gl.getUniformLocation(program, base + '.size'), c.size.x, c.size.y, c.size.z);
+    gl.uniform3f(gl.getUniformLocation(program, base + '.color'), c.color[0], c.color[1], c.color[2]);
+    gl.uniform1f(gl.getUniformLocation(program, base + '.isLambert'), c.isLambert);
+    gl.uniform1f(gl.getUniformLocation(program, base + '.isReflective'), c.isReflective);
+    gl.uniform1f(gl.getUniformLocation(program, base + '.cameraInvisible'), c.cameraInvisible);
+    gl.uniform1f(gl.getUniformLocation(program, base + '.noshadow'), c.noshadow||0);
+    gl.uniform3f(gl.getUniformLocation(program, base + '.rotation'), c.rotation.x, c.rotation.y, c.rotation.z);
+  }
+}
+setCubes(gl, program, cubes)
+  gl.uniform1f(loc_iTime, t);
+  gl.uniform3f(loc_iResolution, canvas.width, canvas.height, 1);
+  camDir = vec3Normalize({
+    x: Math.cos(pitch) * Math.sin(yaw),
+    y: Math.sin(pitch),
+    z: Math.cos(pitch) * Math.cos(yaw)
+  });
+spheres = [
+];
+const radius = 12;
+const center = { x: 0, y: 0, z: -10 };
+const count = 12;
+for (let i = 0; i < count; i++) {
+  const angle = (i / count) * 2 * Math.PI;
+  const x = center.x + radius * Math.cos(angle);
+  const z = center.z + radius * Math.sin(angle);
+  const y = 0; 
+  spheres.push({
+    pos: { x:x, y: cube33, z: z },
+	radius: 1.5,
+	color: [0.5, 0.7, 1.0],
+	isLambert: 1,
+	isReflective: 1,
+	cameraInvisible: 0
+  });
+}
+const rotatedTriangles = rotateTriangles(triangles, {x: 0.001, y: 0.001, z: 0}); 
+triangles=(rotatedTriangles);
+  const worldUp = vec3(0, 0.1, 0);
+  const right = vec3Normalize(vec3Cross(camDir, worldUp));
+  const forwardFlat = vec3Normalize({ x: camDir.x, y: camDir.y, z: camDir.z });
+  const lockMove = ""; 
+   yaw += 0.001
+  gl.uniform3f(loc_camPos, camPos.x, camPos.y, camPos.z);
+  gl.uniform3f(loc_camDir, camDir.x, camDir.y, camDir.z);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.uniform1i(loc_floorTexture, 0);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+  requestAnimationFrame(animate);
+}
+  requestAnimationFrame(animate);
+}
+start()
+function vec3(x=0,y=0,z=0){ return {x,y,z}; }
+function vec3Add(a,b){ return {x:a.x+b.x,y:a.y+b.y,z:a.z+b.z}; }
+function vec3Sub(a,b){ return {x:a.x-b.x,y:a.y-b.y,z:a.z-b.z}; }
+function vec3Scale(v,s){ return {x:v.x*s,y:v.y*s,z:v.z*s}; }
+function vec3Cross(a,b){ 
+  return {
+    x: a.y*b.z - a.z*b.y,
+    y: a.z*b.x - a.x*b.z,
+    z: a.x*b.y - a.y*b.x
+  };
+}
+function vec3Length(v){ return Math.sqrt(v.x*v.x + v.y*v.y + v.z*v.z); }
+function vec3Normalize(v){ 
+  const len = vec3Length(v);
+  return len > 0 ? vec3Scale(v, 1/len) : v;
+}
+// Texture
+const img = new Image();
+img.src = './groundfloor.png';
+img.crossOrigin = "anonymous";
+const texture = gl.createTexture();
+img.onload = () => {
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE, img);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+  gl.bindTexture(gl.TEXTURE_2D, null);
+  loc_floorTexture = gl.getUniformLocation(program, 'floorTexture');
+  requestAnimationFrame(render);
+};
+let cube33=4
+function render(t){
+  t *= 0.001;
+  gl.viewport(0,0,canvas.width,canvas.height);
+  gl.clear(gl.COLOR_BUFFER_BIT);
+  gl.useProgram(program);
+loc_iResolution = gl.getUniformLocation(program, 'iResolution');
+loc_fov = gl.getUniformLocation(program, 'fov');
+loc_dpi = gl.getUniformLocation(program, 'dpi');
+loc_camPos = gl.getUniformLocation(program, 'camPos');
+loc_camDir = gl.getUniformLocation(program, 'camDir');
+loc_floorTexture = gl.getUniformLocation(program, 'floorTexture');
+cube33=Math.sin(t)/4+2;
+const loc_cube33 = gl.getUniformLocation(program, 'cube33');
+gl.uniform1f(loc_cube33, cube33);
+  gl.uniform1f(loc_iTime, t);
+  gl.uniform3f(loc_iResolution, canvas.width, canvas.height, 1);
+  gl.uniform1f(loc_fov, fovValue);
+  gl.uniform1f(loc_dpi, 50);
+  camDir = vec3Normalize({
+    x: Math.cos(pitch)*Math.sin(yaw),
+    y: Math.sin(pitch),
+    z: Math.cos(pitch)*Math.cos(yaw)
+  });
+  gl.uniform3f(loc_camPos, camPos.x, camPos.y, camPos.z);
+  gl.uniform3f(loc_camDir, camDir.x, camDir.y, camDir.z);
+  gl.activeTexture(gl.TEXTURE0);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+ gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+ 
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+gl.enable(gl.BLEND);
+gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+  gl.uniform1i(loc_floorTexture, texture);
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+  requestAnimationFrame(render);
+}
+</script>
+</body>
+</html>
