@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en" ondblclick="document.querySelector('html').requestFullscreen()">
 <head>
 <meta charset="UTF-8" />
 <meta meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
-<link rel="icon" href="./Untitled161_20240404213620.png" type="image/png">
+<link rel="icon" href="./icon.png" type="image/png">
     <meta name="description" content="Hi I'm Kashumy">
     <meta name="keywords" content="kashumy, nexaturion">
     <meta name="author" content="Krystian.P (Kashumy)">
@@ -646,7 +646,6 @@ function rotateTriangles(triangles, rotation) {
   pivot.y /= count;
   pivot.z /= count;
   const R = rotationMatrix(rotRad);
-  // obróć każdy wierzchołek
   return triangles.map(tri => {
     function rotateVertex(v) {
       const local = {x: v.x - pivot.x, y: v.y - pivot.y, z: v.z - pivot.z};
