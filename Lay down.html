@@ -46,9 +46,8 @@ html{
   </style>
 </head>
 <body>
-  <!-- shaders for body -->
   <svg width="0" height="0">
-    <!-- Dodaj filtr 'bm' (bloom) dla całego ciała strony -->
+    <!-- Filtr -->
     <filter id="bm">
       <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
       <feMerge>
@@ -57,7 +56,7 @@ html{
       </feMerge>
     </filter>
 
-    <!-- Filtr 'ca' (chromatic-aberration) dla kontenera z animowanymi kulkami -->
+    <!-- chromatic-aberration -->
     <filter id="ca">
       <feColorMatrix type="matrix" 
         result="red_"             
@@ -86,31 +85,26 @@ html{
         particle.style.top = Math.random() * window.innerHeight + 'px';
         particle.style.left = Math.random() * window.innerWidth + 'px';
         document.body.appendChild(particle);
-
         let size = 2;
         let opacity = 0.5;
-        let hue = 180; // Wartość hue dla koloru zielonego (zielony = 120°)
-
+        let hue = 180; 
         const animationInterval = setInterval(() => {
           size += 0.05;
           opacity -= 0.01;
-          particle.style.transform = `scale(${size})`; // Skalowanie
+          particle.style.transform = `scale(${size})`; 
           particle.style.opacity = opacity;
-
-          // Zmieniamy hue koloru na żółty stopniowo (żółty = 60°)
+          // (yellow = 60°)
           hue = Math.max(hue - 2, 60);
           particle.style.backgroundColor = `hsl(${hue}, 100%, 50%)`;
-
           if (opacity <= 0) {
             clearInterval(animationInterval);
             particle.style.display = 'none';
             particle.remove();
           }
-        }, 30); // Ustawiamy czas interwału animacji (tutaj 30ms)
+        }, 30); 
       }
-
       function animateParticles() {
-        setInterval(createParticle, 200); // Ustawiamy interwał tworzenia nowych kropek (tutaj 200ms)
+        setInterval(createParticle, 200); 
       }
 
       animateParticles();
